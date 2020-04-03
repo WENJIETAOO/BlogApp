@@ -1,0 +1,9 @@
+DELIMITER //
+DROP PROCEDURE IF EXISTS createCommentUrl// 
+
+CREATE PROCEDURE createCommentUrl(IN CommentIdIn int, IN UrlIn VARCHAR(90))
+BEGIN
+UPDATE comment SET Url=UrlIn WHERE CommentId = CommentIdIn;
+SELECT LAST_INSERT_ID();
+END//
+DELIMITER ;

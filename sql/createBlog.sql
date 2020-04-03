@@ -1,0 +1,10 @@
+DELIMITER //
+DROP PROCEDURE IF EXISTS createBlog // 
+
+CREATE PROCEDURE createBlog(IN UserNameIn VARCHAR(50), IN BLogtextIn VARCHAR(255))
+BEGIN
+INSERT INTO blog (BlogText,Username) VALUES
+   (BLogtextIn,UserNameIn);
+SELECT LAST_INSERT_ID();
+END//
+DELIMITER ;

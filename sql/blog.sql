@@ -1,0 +1,8 @@
+DROP TABLE IF EXISTS blog;
+CREATE TABLE blog (
+  BlogID int NOT NULL AUTO_INCREMENT,
+  BlogText VARCHAR(255),
+  Username VARCHAR(50),
+  Url VARCHAR(90),
+  PRIMARY KEY (BlogID)
+);

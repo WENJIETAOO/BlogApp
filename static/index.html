@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Info Blog</title>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+  	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+  	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+  	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.0/angular.min.js"></script>
+<style>
+body {
+    font-family: 'Lato', sans-serif;
+}
+
+.overlay {
+    height: 100%;
+    width: 0;
+    position: fixed;
+    z-index: 1;
+    top: 0;
+    left: 0;
+    background-color: rgb(0,0,0);
+    background-color: rgba(0,0,0, 0.9);
+    overflow-x: hidden;
+    transition: 0.5s;
+}
+
+.overlay-content {
+    position: relative;
+    top: 25%;
+    width: 100%;
+    text-align: center;
+    margin-top: 30px;
+}
+
+.overlay a {
+    padding: 8px;
+    text-decoration: none;
+    font-size: 36px;
+    color: #818181;
+    display: block;
+    transition: 0.3s;
+}
+
+.overlay a:hover, .overlay a:focus {
+    color: #f1f1f1;
+}
+
+.overlay .closebtn {
+    position: absolute;
+    top: 20px;
+    right: 45px;
+    font-size: 60px;
+}
+
+@media screen and (max-height: 450px) {
+  .overlay a {font-size: 20px}
+  .overlay .closebtn {
+    font-size: 40px;
+    top: 15px;
+    right: 35px;
+  }
+}
+
+@keyframes shake {
+  0% { transform: translate(5px, 5px) rotate(0deg); }
+  10% { transform: translate(-5px, -10px) rotate(-1deg); }
+  20% { transform: translate(-15px, 0px) rotate(1deg); }
+  30% { transform: translate(15px, 10px) rotate(0deg); }
+  40% { transform: translate(5px, -5px) rotate(1deg); }
+  50% { transform: translate(-5px, 10px) rotate(-1deg); }
+  60% { transform: translate(-15px, 5px) rotate(0deg); }
+  70% { transform: translate(15px, 5px) rotate(-1deg); }
+  80% { transform: translate(-5px, -5px) rotate(1deg); }
+  90% { transform: translate(5px, 10px) rotate(0deg); }
+  100% { transform: translate(5px, -10px) rotate(-1deg); }
+}
+
+img:hover {
+  animation: shake 0.5s;
+  animation-iteration-count: infinite;
+}
+
+
+</style>
+</head>
+<body>
+
+<div id="myNav" class="overlay">
+  <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+  <div class="overlay-content">
+	 <img src="blog-cloud-md.png" style="float:top; margin: -150px 110px 15px 15px;" alt="BlogIcon">
+	<div id="SigninApp" ng-app = "SigninApp">
+	<div class="col-sm-4 col-sm-offset-3">
+
+   		<div ng-controller = "SigninController">
+   		<form id="signinForm" >
+     		     <div id="username-group" class="form-group">
+     		      <label style="color:white;" for="username">Username</label>
+     		      <input type="text" class="form-control" id="username" name="username" placeholder="FCS Login id" required ng-model="user.username">
+           <!-- errors will go here -->
+     		  	</div>
+
+       <!-- PASSWORD -->
+       <div id="password-group" class="form-group">
+           <label style="color:white;" for="password">Password</label>
+           <input type="password" class="form-control" id="password" name="password" placeholder="FCS password" required ng-model="user.password">
+           <!-- errors will go here -->
+       </div>
+
+       <button type="button" class="btn btn-success" ng-click="signin(user)" postion="left" >Signin<span class="fa fa-arrow-right"></span></button>
+		<p style="color:white;">{{message}}</p>
+ 		  </form>
+	</div>
+	</div>
+	</div>
+
+
+<div id="LogoutApp" ng-app = "LogoutApp">
+<div class="col-sm-4 col-sm-offset-3">
+
+<div ng-controller = "SignoutController">
+<form id="signinForm" >
+<button type="button" class="btn btn-success" ng-click="logout(user)" postion="right" onclick="myClick()" >Signout<span class="fa fa-arrow-right"></span></button>
+<p  style="color:white;">{{message}}</p>
+</form>
+</div>
+</div>
+</div>
+
+
+  </div>
+</div>
+<p>&nbsp;</p>
+<span style="font-size:30px;cursor:pointer;color: #fff" onclick="openNav()">&#9776; Login</span>
+<p>&nbsp;</p>
+
+
+<script>
+function openNav() {
+    document.getElementById("myNav").style.width = "30%";
+}
+
+function closeNav() {
+    document.getElementById("myNav").style.width = "0%";
+}
+
+function myClick() {
+setTimeout(
+    function() {
+      closeNav();
+    }, 2000);  
+	
+	setTimeout(
+    function() {
+      window.location.reload();
+    }, 3500);
+}
+</script>
+
+<script>
+var app1 = angular.module('SigninApp', [])
+ .controller('SigninController', ['$scope', '$http', function($scope, $http) {
+	$scope.message = 'welcome to the blog';
+   $scope.signin = function (user){
+     credentials = JSON.stringify({"username": user.username, "password": user.password});
+  // Submit the credentials
+    $http.post('https://info3103.cs.unb.ca:35669/signin', credentials ).then(function(data) {
+       // Success here means the transmission was successful - not necessarily the login.
+       // The data.status determines login success
+	if(data.status == 201) {
+         // You're in!
+         // But does the session carry? Let's try some other endpoint that requires a login
+          $http.get('https://info3103.cs.unb.ca:35669/hello').then( function(data){
+                          $scope.message = data.data.message;
+});
+}
+});
+}}]);
+
+
+var app2 = angular.module('LogoutApp', [])
+.controller('SignoutController', ['$scope', '$http', function($scope, $http) {
+			 $scope.message ="";
+    $scope.logout = function (user){
+      $http.delete('https://info3103.cs.unb.ca:35669/signin').then(function(data) {
+        if(data.status == 200) {
+                           $scope.message = data.data.message;
+}
+});
+}}]);
+
+angular.bootstrap(document.getElementById("LogoutApp"), ['LogoutApp']);
+</script>
+     
+</body>
+</html>
+
+
+
+
+<!DOCTYPE html>
+<html>
+<head>
+
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+  	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+  	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+  	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.0/angular.min.js"></script>
+
+
+<style>
+body {font-family: Arial;}
+
+/* Style the tab */
+div.tab {
+    overflow: hidden;
+    border: 1px solid #ccc;
+    background-color: #f1f1f1;
+}
+
+/* Style the buttons inside the tab */
+div.tab button {
+    background-color: inherit;
+    float: left;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    padding: 14px 16px;
+    transition: 0.3s;
+    font-size: 30px;
+    
+}
+
+/* Change background color of buttons on hover */
+div.tab button:hover {
+    background-color: #ddd;
+}
+
+/* Create an active/current tablink class */
+div.tab button.active {
+    background-color: #ccc;
+}
+
+/* Style the tab content */
+.tabcontent {
+    display: none;
+    padding: 6px 12px;
+    -webkit-animation: fadeEffect 1s;
+    animation: fadeEffect 1s;
+}
+
+/* Fade in tabs */
+@-webkit-keyframes fadeEffect {
+    from {opacity: 0;}
+    to {opacity: 1;}
+}
+
+@keyframes fadeEffect {
+    from {opacity: 0;}
+    to {opacity: 1;}
+}
+
+.btn {
+    border: none; /* Remove borders */
+    color: white; /* Add a text color */
+    padding: 10px 15px; /* Add some padding */
+    cursor: pointer; /* Add a pointer cursor on mouse-over */
+}
+
+.modal {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 1; /* Sit on top */
+    padding-top: 100px; /* Location of the box */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgb(0,0,0); /* Fallback color */
+    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+}
+
+/* Modal Content */
+.modal-content {
+    background-color: rgba(0, 0, 0, 0.5);
+    margin: auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 41%;
+}
+
+/* The Close Button */
+.close {
+    color: #aaaaaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+    color: #000;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.post {background-color: #4CAF50; float:relative} /* Green */
+.post:hover {background-color: #46a049;}
+
+.showBlog {background-color: #2196F3;} /* Blue */
+.showBlog:hover {background: #0b7dda;}
+
+.comment {background-color: #ff9800;} /* Orange */
+.comment:hover {background: #e68a00;}
+
+.delete {background-color: #f44336;} /* Red */ 
+.delete:hover {background: #da190b;}
+
+.deleteC {background-color: #f44336;padding: 5px 10px;position:absolute;
+    bottom:0;
+    right:0;} /* Red */ 
+.deleteC:hover {background: #da190b;padding: 5px 10px;position:absolute;
+    bottom:0;
+    right:0;}
+
+textarea::-webkit-input-placeholder {  color: #fff;}
+
+.label {
+    color: white;
+    padding: 8px;
+}
+
+.other {background-color: #58ACFA;}
+
+
+body {
+    font-family: 'Lato', sans-serif;
+}
+
+.overlaya {
+    height: 0%;
+    width: 100%;
+    position: fixed;
+    z-index: 1;
+    top: 0;
+    left: 0;
+    background-color: rgb(0,0,0);
+    background-color: rgba(0,0,0, 1);
+    overflow-y: hidden;
+    transition: 1s;
+}
+
+.overlaya-contenta {
+    position: relative;
+    top: 25%;
+    width: 100%;
+    text-align: center;
+    margin-top: 30px;
+}
+
+.overlaya a {
+    padding: 8px;
+    text-decoration: none;
+    font-size: 36px;
+    color: #818181;
+    display: block;
+    transition: 0.3s;
+}
+
+.overlaya a:hover, .overlaya a:focus {
+    color: #f1f1f1;
+}
+
+.overlaya .closebtn {
+    position: absolute;
+    top: 20px;
+    right: 45px;
+    font-size: 60px;
+}
+
+@media screen and (max-height: 450px) {
+  .overlaya a {font-size: 20px}
+  .overlaya .closebtn {
+    font-size: 40px;
+    top: 15px;
+    right: 35px;
+  }
+}
+
+div.absolute {
+    position: absolute;
+    top: 10px;
+    right: 0;
+    width: 150px;
+    height: 100px;
+    border: 0px solid #73AD21;
+    color: #fff;
+}
+
+
+div.middle {
+    text-align: center;
+    border: 0px solid #73AD21;
+    color: #fff;
+}
+
+
+.earth {
+  width: 300px;
+  height: 300px;
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  margin: auto;
+  overflow: hidden;
+  border-radius: 50%;
+  box-shadow: 0 0 20px 20px #000 inset, 0 0 20px 2px #000;
+}
+
+.earth:after {
+  position: absolute;
+  content: "";
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  box-shadow: -20px -20px 50px 2px #000 inset;
+  border-radius: 50%;
+}
+
+.earth > div {
+  width: 200%;
+  height: 100%;
+  animation: spin 30s linear alternate infinite;
+  background: url(https://web.opendrive.com/api/v1/download/file.json/NTlfMTQ1MTkzNDhf?inline=1);
+  /*orginal image at https://upload.wikimedia.org/wikipedia/commons/thumb/c/c4/Earthmap1000x500compac.jpg/640px-Earthmap1000x500compac.jpg */
+  background-size: cover;
+}
+@keyframes spin {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+h1 {
+    position: absolute;
+    left: 750px;
+    top: 15px;
+    color: #fff;
+}
+
+@font-face {
+    font-family: GeveretLevin;
+    src: url(//yarivfruend.com/Portfolio/neon/GveretLevin-Regular.ttf);
+}
+
+
+.container {
+    text-align: center;
+}
+
+.neon-text {
+    background-color: rgba(102, 204, 255, 0.04);
+    box-shadow: 0 0 70px 20px rgba(102, 204, 255, 0.04);
+    border-radius: 200px;
+    padding: 10px 26px 60px 25px;
+    margin: 0vh auto 0;
+    font-family: 'GeveretLevin', sans-serif;
+    font-size: 50px;
+    letter-spacing: 15px;
+    color: #66ccff;
+    line-height: 0;
+    filter: drop-shadow(0px 0px 13px #66ccff);
+    -webkit-text-stroke: 6px rgba(102, 204, 255, 0.3);
+    display: inline-block;
+    position: relative;
+    animation: glow 170ms ease infinite forwards;
+}
+
+@keyframes glow {
+    0% {
+
+    }
+    50% {
+        filter: drop-shadow(0px 0px 17px #66ccff);
+    }
+    100% {
+
+    }
+}
+
+</style>
+</head>
+<body background="moving-through-stars-in-space_-1zccenlb__F0000.png" style="background-attachment:fixed"> 
+<div class="container">
+         <div class="neon-text">〖情報 〗 三壹零三 博客</div>
+    </div>
+<div class="absolute"><p>This Blog is make by:</p><p>Tianhao Zhao</p><p>Wenjie Tao</p><p>&nbsp</p><p>&nbsp</p><p>&nbsp</p><p>Special Thanks</p><p>Jiacheng Jin</p></div>
+<div class="tab">
+  <button class="tablinks" onclick="openTab(event, 'Blog')">Blog</button>
+  <button class="tablinks" onclick="openTab(event, 'Post')">Post</button>
+  <button class="tablinks" onclick="openTab(event, 'Earth')">Earth</button>
+</div>
+
+
+
+<div id="Blog" class="tabcontent">
+
+	<div id="BlogDisApp" ng-app = "BlogDisApp">
+	<div class="col-sm-10 col-sm-offset-1">
+	<div ng-controller = "BlogController">
+	<ul class="list-group">
+	<li class="list-group-item" ng-repeat = "blog in AllBlog">
+
+	<span class="label other">{{blog.Username}}: </span>
+	<font size="6">&nbsp {{blog.BlogText}}</font>
+
+
+
+<div id="DelBApp">
+<div>
+
+			<!-- OUR FORM -->
+<div ng-controller = "DelBController">
+<button class="btn delete" ng-click="DelBlogID(blog.BlogID);show();" style="float: right;">Delete</button>	
+</div>
+</div>
+</div>
+
+
+
+
+ 	
+
+
+
+
+
+
+<div id="CommentApp" >
+<div ng-controller = "CommentController">
+<form id="signinForm">
+<button type="button" class="btn btn-success" ng-click="getBlogID(blog.BlogID)">Show Comment<span class="fa fa-arrow-right"></span></button>
+											<ul class="list-group">
+											<li class="list-group-item" ng-repeat = "Com in Comments">
+															<span class="label label-warning">{{Com.Username}} : </span>
+															 <font size="4">&nbsp {{Com.commentText}}</font>
+															<div id="DelCApp">
+															 	<div>
+
+															 			<!-- OUR FORM -->
+															 			<div ng-controller = "DelCController">
+															 					<!-- NAME -->
+															 					<button type="button" class="btn deleteC" ng-click="DelCID(Com.CommentID);getBlogID(blog.BlogID);">delete<span class="fa fa-arrow-right"></span></button>
+															 	</div>
+															 </div>
+															 </div>
+
+
+														</li>
+														
+<div id="PostCApp">
+<div>
+											<div ng-controller = "PostCController">
+											<form id="signinForm" >
+															<input placeholder="Type your comment here..." type="text" id="Commenttext" class="form-control" name="Commenttext" required ng-model="Commenttext">
+													<button type="button" class="btn btn-success" ng-click="setBlogID(blog.BlogID);postC(Commenttext);getBlogID(blog.BlogID)">post<span class="fa fa-arrow-right"></span></button>
+											</form>
+	</div>
+	</div>
+	</div>
+
+													</ul>
+ </form>
+</div>
+ </div>
+
+
+	</li>
+	</ul>
+	</div>
+	</div>
+	</div>
+</div>
+
+
+
+
+
+<div id="Post" class="tabcontent">
+<div id="PostBlogApp">
+	<div ng-controller = "PostController">
+	<form id="signinForm" >
+  <textarea id="BlogText" type="BlogTextInput" style="color: black; background-color: rgba(0, 0, 0, 0.5);color:#fff;" placeholder="Type your blog here..." rows="25" cols="230" ng-model="some.BlogText"></textarea>
+<button class="btn post" ng-click="post(some)">POST</button>
+<button class="btn post" onclick="eraseTextBlog();">CLEAR</button>
+<p style="color:white;">{{message}}</p>
+</form>
+</div>
+</div>
+</div>
+
+<div id="Earth" class="tabcontent">
+<!--<button onclick="openNava()">Don'try it</button>
+<font Size = 10 color="red">Once you try it you can't go back</font>
+<div id="myNava" class="overlaya">
+  <div class="overlay-content">
+	<img src="4178542-6b0d0d754afafa17.jpg" style="float:top; margin: -150px 110px 15px 15px;" alt="BlogIcon">
+	<font size="6" style="color:red;">Do you want play a GAME ????????</font>
+	<button onclick="closeNava()">YES</button>
+	<button onclick="closeNava()">NO</button>
+  </div>
+</div>-->
+
+<div class="earth">
+  <div></div>
+</div>
+
+</div>
+
+<script>
+function openTab(evt, tabName) {
+    var i, tabcontent, tablinks;
+    tabcontent = document.getElementsByClassName("tabcontent");
+    for (i = 0; i < tabcontent.length; i++) {
+        tabcontent[i].style.display = "none";
+    }
+    tablinks = document.getElementsByClassName("tablinks");
+    for (i = 0; i < tablinks.length; i++) {
+        tablinks[i].className = tablinks[i].className.replace(" active", "");
+    }
+    document.getElementById(tabName).style.display = "block";
+    evt.currentTarget.className += " active";
+}
+function eraseTextBlog() {
+    document.getElementById("BlogText").value = "";
+}
+
+function eraseTextComment() {
+    document.getElementById("inputComment").value = "";
+}
+
+function openNava() {
+    document.getElementById("myNava").style.height = "100%";
+}
+
+function closeNava() {
+    document.getElementById("myNava").style.height = "0%";
+    setTimeout(function(){document.getElementById("myNava").style.height = "100%";}, 2000);
+
+}
+
+
+function CommentBlog(){
+
+// Get the modal
+var modal = document.getElementById('myModal');
+
+// Get the button that opens the modal
+var btn = document.getElementById("myBtn");
+
+// Get the <span> element that closes the modal
+var span = document.getElementsByClassName("close")[0];
+
+// When the user clicks the button, open the modal 
+btn.onclick = function() {
+    modal.style.display = "block";
+}
+
+// When the user clicks on <span> (x), close the modal
+span.onclick = function() {
+    modal.style.display = "none";
+}
+
+// When the user clicks anywhere outside of the modal, close it
+window.onclick = function(event) {
+    if (event.target == modal) {
+        modal.style.display = "none";
+    }
+}
+}
+
+
+
+var app3 = angular.module('App', [])
+angular.module('App')
+ .controller('BlogController', ['$scope', '$http', function($scope, $http) {
+   $scope.message = '';
+var url = "https://info3103.cs.unb.ca:35669/Blog";
+  $http.get(url).success( function(response) {
+     $scope.AllBlog = response.AllBlog;
+});
+$scope.show = function (){
+var url = "https://info3103.cs.unb.ca:35669/Blog";
+	$http.get(url).success( function(response) {
+ $scope.AllBlog = response.AllBlog;
+	 });
+  };
+}]);
+
+
+ angular.module('App')
+  .controller('CommentController', ['$scope', '$http', function($scope, $http) {
+	$scope.BlogID='';
+	$scope.setBlogID = function (some){
+					 				 $scope.BlogID=some;
+ }
+	 $scope.getBlogID = function (some){
+	var url = "https://info3103.cs.unb.ca:35669/Blog/Comment/";
+	var url2 = url + some;
+	 $http.get(url2).success( function(response){
+	 $scope.Comments=response.Comments;
+	 });}
+}]);
+
+angular.module('App').controller('PostController', ['$scope', '$http', function($scope, $http) {
+	$scope.message = '';
+	$scope.post = function (some){
+	credentials = JSON.stringify({"BlogText": some.BlogText});
+	// Submit the credentials
+	$http.post('https://info3103.cs.unb.ca:35669/Blog', credentials ).then(function(data) {
+	// Success here means the transmission was successful - not necessarily the login.
+	// The data.status determines login success
+	if(data.status == 201) {
+	// You're in!
+	$scope.message = 'Post success';
+ }
+ });
+ }}]);
+
+
+angular.module('App').controller('PostCController', ['$scope', '$http', function($scope, $http) {
+					$scope.message = 'NaNNaNNaNNaNNaNaNNaNNaNNaN?';
+					$scope.BlogID='';
+					$scope.setBlogID = function (some){
+ 					 				 $scope.BlogID=some;
+ 				 }
+					$scope.postC = function (s){
+						credentials = JSON.stringify({"BlogID":$scope.BlogID, "CommentText":s});
+							 // Submit the credentials
+					$http.post('https://info3103.cs.unb.ca:35669/Comment', credentials ).then(function(data) {
+						// Success here means the transmission was successful - not necessarily the login.
+						// The data.status determines login success
+					if(data.status == 201) {
+						// You're in!
+						// But does the session carry? Let's try some other endpoint that requires a login
+						 $http.get('https://info3103.cs.unb.ca:35669/hello').then( function(data){
+														 $scope.message = data.data.uri;
+													 });
+												 }
+											 });
+										 }}]);
+
+
+
+
+
+	 		angular.module('App')
+	 		 .controller('DelBController', ['$scope', '$http', function($scope, $http) {
+	 			 $scope.BlogID='';
+				 $scope.setBlogID = function (some){
+									 $scope.BlogID=some;
+				 }
+	 			 $scope.DelBlogID = function (some){
+	 			 var url = "https://info3103.cs.unb.ca:35669/Blog/";
+
+	 			 var url2 = url + some;
+
+	 				 $http.delete(url2).then(function(data){
+						 if(data.status == 200) {
+                            $scope.message = 'Delete blog success';
+ 												 };
+	 				 });}
+	 			}]);
+
+
+angular.module('App')
+				 .controller('DelCController', ['$scope', '$http', function($scope, $http) {
+					 $scope.CommentID='';
+					 $scope.setBlogID = function (some){
+										 $scope.CommentID=some;
+					 }
+					 $scope.DelCID = function (some){
+					 var url = "https://info3103.cs.unb.ca:35669/Comment/";
+
+					 var url2 = url + some;
+
+						 $http.delete(url2).then(function(data){
+							 if(data.status == 200) {
+															$scope.message = data.data.message;
+													 };
+						 });}
+					}]);
+
+
+
+angular.bootstrap(document.getElementById("BlogDisApp"), ['App']);
+angular.bootstrap(document.getElementById("CommentApp"), ['App']);
+angular.bootstrap(document.getElementById("PostBlogApp"), ['App']);
+angular.bootstrap(document.getElementById("PostCApp"), ['App']);
+angular.bootstrap(document.getElementById("DelBApp"), ['App']);
+angular.bootstrap(document.getElementById("DelCApp"), ['App'])
+</script>
+
+     
+</body>
+</html> 
+
+
+

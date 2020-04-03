@@ -1,0 +1,8 @@
+DELIMITER //
+DROP PROCEDURE IF EXISTS getAllComment // 
+
+CREATE PROCEDURE getAllComment(In BlogIdIn int)
+BEGIN
+	SELECT * FROM comment WHERE BlogID=BlogIdIn;
+END//
+DELIMITER ;
